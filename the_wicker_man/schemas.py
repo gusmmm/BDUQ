@@ -14,6 +14,7 @@ class DoenteSchema(BaseModel):
 
 
 class DoentePublic(BaseModel):
+    id: int
     numero_processo: int
     nome: str
 

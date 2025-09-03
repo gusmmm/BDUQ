@@ -36,3 +36,24 @@ def read_doentes():
     doentes_public = [DoentePublic(**doente.model_dump())
                       for doente in database]
     return DoentesList(doentes=doentes_public)
+
+
+@app.get('/doentes/{doente_id}',
+         status_code=HTTPStatus.OK)
+def read_doente(doente_id: int):
+    for doente in database:
+        if doente.id == doente_id:
+            return DoentePublic(**doente.model_dump())
+    return {"error": "Doente not found"}
+
+
+@app.put('/doentes/{doente_id}',
+         status_code=HTTPStatus.OK)
+def update_doente(doente_id: int, doente: DoenteSchema):
+    for index, existing_doente in enumerate(database):
+        if existing_doente.id == doente_id:
+            updated_doente = DoenteDB(id=doente_id, **doente.model_dump())
+            database[index] = updated_doente
+            ic(f"Doente updated: {updated_doente.model_dump()}")
+            return DoentePublic(**updated_doente.model_dump())
+    return {"error": "Doente not found"}
