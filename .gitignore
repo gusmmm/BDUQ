@@ -3,3 +3,22 @@
 
 .ruff_cache/
 .pytest_cache/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Coverage reports
+.coverage
+htmlcov/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Lock and version files
+uv.lock
+.python-version
