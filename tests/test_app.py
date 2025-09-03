@@ -56,3 +56,53 @@ def test_read_doente(client):
     read_doente = read_response.json()
     assert read_doente["numero_processo"] == doente_data["numero_processo"]
     assert read_doente["nome"] == doente_data["nome"]
+
+
+def test_update_doente(client):
+    # First, create a doente to ensure there is one to update
+    doente_data = {
+        "numero_processo": 12347,
+        "nome": "Carlos Pereira",
+        "data_nascimento": "1975-03-03",
+        "sexo": "M",
+        "morada": "Praça Exemplo, 789"
+    }
+    create_response = client.post('/doentes', json=doente_data)
+    assert create_response.status_code == HTTPStatus.CREATED
+    created_doente = create_response.json()
+    doente_id = created_doente["id"]
+
+    # Now, update the created doente
+    updated_data = {
+        "numero_processo": 12347,
+        "nome": "Carlos Pereira Updated",
+        "data_nascimento": "1975-03-03",
+        "sexo": "M",
+        "morada": "Praça Exemplo, 789 Updated"
+    }
+    update_response = client.put(f'/doentes/{doente_id}', json=updated_data)
+    assert update_response.status_code == HTTPStatus.OK
+    updated_doente = update_response.json()
+    assert updated_doente["nome"] == updated_data["nome"]
+    assert updated_doente["numero_processo"] == updated_data["numero_processo"]
+
+    # Verify the update by reading the doente again
+    read_response = client.get(f'/doentes/{doente_id}')
+    assert read_response.status_code == HTTPStatus.OK
+    read_doente = read_response.json()
+    assert read_doente["nome"] == updated_data["nome"]
+    assert read_doente["numero_processo"] == updated_data["numero_processo"]
+
+
+def test_update_doente_not_found(client):
+    updated_data = {
+        "numero_processo": 12348,
+        "nome": "Nonexistent Doente",
+        "data_nascimento": "2000-04-04",
+        "sexo": "F",
+        "morada": "Rua Nowhere, 000"
+    }
+    # Assuming 9999 does not exist
+    response = client.put('/doentes/9999', json=updated_data)
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {"error": "Doente not found"}
