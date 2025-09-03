@@ -24,6 +24,13 @@
 
 ## testing
 - if you need to create testing scripts, ALWAYS create them in the tests/ directory.
+- IMPORTANT RULE: all tests/ scripts must be able to run independently from each other.
+- IMPORTANT RULE: all tests/ scripts must be written using pytest.
+
+## shortcuts
+- use the taskipy package to create shortcuts for common tasks.
+- the tasks list are located in the pyproject.toml file.
+- to run a task, use the command 'uv run <task_name>'
 
 ## database
 - the database is used to store patient and hospital admissions information.
