@@ -1,4 +1,10 @@
+import random
 from http import HTTPStatus
+
+
+def _unique_numero_processo() -> int:
+    # Generate an 8-digit random number to avoid unique constraint collisions
+    return random.randint(10_000_000, 99_999_999)
 
 
 def test_read_root(client):
@@ -9,11 +15,11 @@ def test_read_root(client):
 
 def test_create_doente(client):
     doente_data = {
-        "numero_processo": 12345,
-        "nome": "João Silva",
+        "numero_processo": _unique_numero_processo(),
+        "nome": "João Palo Silva",
         "data_nascimento": "1980-01-01",
         "sexo": "M",
-        "morada": "Rua Exemplo, 123"
+        "morada": "Rua Testis, 123"
     }
     response = client.post('/doentes', json=doente_data)
     assert response.status_code == HTTPStatus.CREATED
@@ -39,7 +45,7 @@ def test_read_doente_not_found(client):
 def test_read_doente(client):
     # First, create a doente to ensure there is one to read
     doente_data = {
-        "numero_processo": 12346,
+        "numero_processo": _unique_numero_processo(),
         "nome": "Maria Silva",
         "data_nascimento": "1990-02-02",
         "sexo": "F",
@@ -60,8 +66,9 @@ def test_read_doente(client):
 
 def test_update_doente(client):
     # First, create a doente to ensure there is one to update
+    numero = _unique_numero_processo()
     doente_data = {
-        "numero_processo": 12347,
+        "numero_processo": numero,
         "nome": "Carlos Pereira",
         "data_nascimento": "1975-03-03",
         "sexo": "M",
@@ -74,7 +81,7 @@ def test_update_doente(client):
 
     # Now, update the created doente
     updated_data = {
-        "numero_processo": 12347,
+        "numero_processo": numero,
         "nome": "Carlos Pereira Updated",
         "data_nascimento": "1975-03-03",
         "sexo": "M",
@@ -96,7 +103,7 @@ def test_update_doente(client):
 
 def test_update_doente_not_found(client):
     updated_data = {
-        "numero_processo": 12348,
+        "numero_processo": _unique_numero_processo(),
         "nome": "Nonexistent Doente",
         "data_nascimento": "2000-04-04",
         "sexo": "F",
@@ -111,7 +118,7 @@ def test_update_doente_not_found(client):
 def test_delete_doente(client):
     # First, create a doente to ensure there is one to delete
     doente_data = {
-        "numero_processo": 12349,
+        "numero_processo": _unique_numero_processo(),
         "nome": "Ana Costa",
         "data_nascimento": "1985-05-05",
         "sexo": "F",

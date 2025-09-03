@@ -1,17 +1,17 @@
 
+import random
 from dataclasses import asdict
 
 from sqlalchemy import select
 
 from the_wicker_man.models import Doente
 
-NUMERO_PROCESSO = 12345
-
 
 def test_create_doente(session, mock_db_time):
+    numero_processo = random.randint(10_000_000, 99_999_999)
     with mock_db_time(model=Doente) as fixed_time:
         doente_data = Doente(
-            numero_processo=NUMERO_PROCESSO,
+            numero_processo=numero_processo,
             nome="João Silva",
             data_nascimento="1980-01-01",
             sexo="M",
@@ -21,11 +21,11 @@ def test_create_doente(session, mock_db_time):
         session.commit()
 
     doente_in_db = session.scalar(
-        select(Doente).where(Doente.numero_processo == NUMERO_PROCESSO)
+        select(Doente).where(Doente.numero_processo == numero_processo)
     )
     assert asdict(doente_in_db) == {
         "id": 1,
-        "numero_processo": NUMERO_PROCESSO,
+        "numero_processo": numero_processo,
         "nome": "João Silva",
         "data_nascimento": "1980-01-01",
         "sexo": "M",

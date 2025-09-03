@@ -1,10 +1,13 @@
 from http import HTTPStatus
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from icecream import ic
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
+from the_wicker_man.database import get_session
+from the_wicker_man.models import Doente
 from the_wicker_man.schemas import (
-    DoenteDB,
     DoentePublic,
     DoenteSchema,
     DoentesList,
@@ -12,8 +15,6 @@ from the_wicker_man.schemas import (
 )
 
 app = FastAPI()
-
-database = []
 
 
 @app.get('/', response_model=MessageSchema, status_code=HTTPStatus.OK)
@@ -23,51 +24,99 @@ def read_root():
 
 @app.post('/doentes', status_code=HTTPStatus.CREATED,
           response_model=DoentePublic)
-def create_doente(doente: DoenteSchema):
-    doente_id = len(database) + 1
-    doente_db = DoenteDB(id=doente_id, **doente.model_dump())
-    database.append(doente_db)
-    ic(f"Doente created: {doente_db.model_dump()}")
+def create_doente(doente: DoenteSchema,
+                  session: Session = Depends(get_session)):
+    doente_db = session.scalar(
+        select(Doente).where(
+            (Doente.numero_processo == doente.numero_processo)
+            )
+    )
+
+    if doente_db:
+        if doente_db.numero_processo == doente.numero_processo:
+            raise HTTPException(
+                status_code=HTTPStatus.CONFLICT,
+                detail='Doente with this numero_processo already exists',
+            )
+
+    doente_db = Doente(
+        numero_processo=doente.numero_processo,
+        nome=doente.nome,
+        data_nascimento=doente.data_nascimento,
+        sexo=doente.sexo,
+        morada=doente.morada,
+    )
+    session.add(doente_db)
+    session.commit()
+    session.refresh(doente_db)
+
     return doente_db
 
 
 @app.get('/doentes', response_model=DoentesList, status_code=HTTPStatus.OK)
-def read_doentes():
-    doentes_public = [DoentePublic(**doente.model_dump())
-                      for doente in database]
+def read_doentes(session: Session = Depends(get_session)):
+    rows = session.scalars(select(Doente)).all()
+    doentes_public = [
+        DoentePublic(
+            id=row.id,
+            numero_processo=row.numero_processo,
+            nome=row.nome,
+        )
+        for row in rows
+    ]
     return DoentesList(doentes=doentes_public)
 
 
 @app.get('/doentes/{doente_id}',
          status_code=HTTPStatus.OK)
-def read_doente(doente_id: int):
-    for doente in database:
-        if doente.id == doente_id:
-            return DoentePublic(**doente.model_dump())
-    return {"error": "Doente not found"}
+def read_doente(doente_id: int, session: Session = Depends(get_session)):
+    doente = session.get(Doente, doente_id)
+    if not doente:
+        return {"error": "Doente not found"}
+    return DoentePublic(
+        id=doente.id,
+        numero_processo=doente.numero_processo,
+        nome=doente.nome,
+    )
 
 
 @app.put('/doentes/{doente_id}',
          status_code=HTTPStatus.OK)
-def update_doente(doente_id: int, doente: DoenteSchema):
-    for index, existing_doente in enumerate(database):
-        if existing_doente.id == doente_id:
-            updated_doente = DoenteDB(id=doente_id, **doente.model_dump())
-            database[index] = updated_doente
-            ic(f"Doente updated: {updated_doente.model_dump()}")
-            return DoentePublic(**updated_doente.model_dump())
-    return {"error": "Doente not found"}
+def update_doente(
+    doente_id: int,
+    doente: DoenteSchema,
+    session: Session = Depends(get_session),
+):
+    existing = session.get(Doente, doente_id)
+    if not existing:
+        return {"error": "Doente not found"}
+
+    existing.numero_processo = doente.numero_processo
+    existing.nome = doente.nome
+    existing.data_nascimento = doente.data_nascimento
+    existing.sexo = doente.sexo
+    existing.morada = doente.morada
+    session.commit()
+    session.refresh(existing)
+
+    ic(f"Doente updated: id={existing.id}")
+    return DoentePublic(
+        id=existing.id,
+        numero_processo=existing.numero_processo,
+        nome=existing.nome,
+    )
 
 
 @app.delete('/users/{user_id}', response_model=MessageSchema)
-def delete_user(user_id: int):
-    if user_id > len(database) or user_id < 1:
+def delete_user(user_id: int, session: Session = Depends(get_session)):
+    doente = session.get(Doente, user_id)
+    if not doente:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND, detail='User not found'
         )
 
     ic(f"Deleting user with ID: {user_id}")
-    ic(f"Doente database record before deletion: {database[user_id - 1]}")
-    del database[user_id - 1]
+    session.delete(doente)
+    session.commit()
 
     return {'message': 'User deleted'}
