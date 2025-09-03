@@ -1,19 +1,13 @@
 from http import HTTPStatus
 
-from fastapi.testclient import TestClient
 
-from the_wicker_man.app import app
-
-client = TestClient(app)
-
-
-def test_read_root():
+def test_read_root(client):
     response = client.get('/')
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'Olá Mundo!'}
 
 
-def test_create_doente():
+def test_create_doente(client):
     doente_data = {
         "numero_processo": 12345,
         "nome": "João Silva",
