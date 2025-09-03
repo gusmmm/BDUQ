@@ -25,3 +25,4 @@ def session():
     finally:
         db.close()
         table_registry.metadata.drop_all(engine)
+        engine.dispose()
