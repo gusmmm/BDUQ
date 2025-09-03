@@ -11,6 +11,9 @@ __pycache__/
 # Ignore __pycache__ in the_wicker_man
 the_wicker_man/__pycache__/
 
+# Ignore __pycache__ in tests
+tests/__pycache__/
+
 # Coverage reports
 .coverage
 htmlcov/
