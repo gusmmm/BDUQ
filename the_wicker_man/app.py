@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from fastapi import FastAPI
 
-from the_wicker_man.schemas import MessageSchema, DoenteSchema
+from the_wicker_man.schemas import MessageSchema, DoenteSchema, DoentePublic
 
 app = FastAPI()
 
@@ -11,6 +11,6 @@ app = FastAPI()
 def read_root():
     return {'message': 'Olá Mundo!'}
 
-@app.post('/doentes', status_code=HTTPStatus.CREATED)
+@app.post('/doentes', status_code=HTTPStatus.CREATED,response_model=DoentePublic)
 def create_doente(doente: DoenteSchema):
-    return {"message": "Doente created successfully"}
+    return doente

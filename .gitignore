@@ -8,6 +8,9 @@
 __pycache__/
 *.py[cod]
 
+# Ignore __pycache__ in the_wicker_man
+the_wicker_man/__pycache__/
+
 # Coverage reports
 .coverage
 htmlcov/

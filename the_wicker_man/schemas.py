@@ -11,3 +11,8 @@ class DoenteSchema(BaseModel):
     sexo: str
     morada: str
 
+class DoentePublic(BaseModel):
+    numero_processo: int
+    nome: str
+
+
