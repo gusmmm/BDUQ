@@ -145,3 +145,25 @@ def test_delete_doente_not_found(client):
     response = client.delete('/users/9999')
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json() == {'detail': 'User not found'}
+
+
+def test_create_doente_conflict(client):
+    # Create a doente
+    numero = _unique_numero_processo()
+    payload = {
+        "numero_processo": numero,
+        "nome": "Duplicado",
+        "data_nascimento": "1999-09-09",
+        "sexo": "M",
+        "morada": "Rua Duplicada, 1"
+    }
+
+    r1 = client.post('/doentes', json=payload)
+    assert r1.status_code == HTTPStatus.CREATED
+
+    # Try to create another doente with the same numero_processo
+    r2 = client.post('/doentes', json=payload)
+    assert r2.status_code == HTTPStatus.CONFLICT
+    assert r2.json() == {
+        'detail': 'Doente with this numero_processo already exists'
+    }
