@@ -20,3 +20,11 @@ def test_create_doente(client):
     response_data = response.json()
     assert response_data["numero_processo"] == doente_data["numero_processo"]
     assert response_data["nome"] == doente_data["nome"]
+
+
+def test_read_doentes(client):
+    response = client.get('/doentes')
+    assert response.status_code == HTTPStatus.OK
+    response_data = response.json()
+    assert "doentes" in response_data
+    assert isinstance(response_data["doentes"], list)

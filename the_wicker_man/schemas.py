@@ -21,5 +21,6 @@ class DoentePublic(BaseModel):
 class DoenteDB(DoenteSchema):
     id: int
 
+
 class DoentesList(BaseModel):
     doentes: list[DoentePublic]
