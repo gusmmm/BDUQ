@@ -6,7 +6,6 @@
 - IMPORTANT RULE: always check the memory file in .memory/ to see the progress of the project
 - your knowledge is outdated. When implementing code based on python packages, consult the official documentation in the internet for the most accurate and up-to-date information.
 - to manage python packages and dependencies ALWAYS use the tool 'uv'
-- to run the application use the command 'uv run main.py'
 - use 'uv add <package_name>' to install new packages
 - use functions from the 'icecream' package for debugging and logging.
 
