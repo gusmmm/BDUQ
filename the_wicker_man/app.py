@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Query
 from icecream import ic
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -54,8 +54,15 @@ def create_doente(doente: DoenteSchema,
 
 
 @app.get('/doentes', response_model=DoentesList, status_code=HTTPStatus.OK)
-def read_doentes(session: Session = Depends(get_session)):
-    rows = session.scalars(select(Doente)).all()
+def read_doentes(
+    offset: int = Query(0, ge=0),
+    limit: int | None = Query(None, ge=1),  # default: no limit
+    session: Session = Depends(get_session),
+):
+    query = select(Doente).order_by(Doente.id).offset(offset)
+    if limit is not None:
+        query = query.limit(limit)
+    rows = session.scalars(query).all()
     doentes_public = [
         DoentePublic(
             id=row.id,

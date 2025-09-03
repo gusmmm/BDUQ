@@ -7,6 +7,10 @@ def _unique_numero_processo() -> int:
     return random.randint(10_000_000, 99_999_999)
 
 
+# Number of doentes to create in pagination tests
+TEST_DOENTES_TOTAL = 12
+
+
 def test_read_root(client):
     response = client.get('/')
     assert response.status_code == HTTPStatus.OK
@@ -167,3 +171,58 @@ def test_create_doente_conflict(client):
     assert r2.json() == {
         'detail': 'Doente with this numero_processo already exists'
     }
+
+
+def test_read_doentes_pagination_defaults(client):
+    # Create 12 doentes
+    created_ids = []
+    for i in range(TEST_DOENTES_TOTAL):
+        payload = {
+            "numero_processo": _unique_numero_processo(),
+            "nome": f"User {i}",
+            "data_nascimento": "1990-01-01",
+            "sexo": "M" if i % 2 == 0 else "F",
+            "morada": f"Rua {i}"
+        }
+        r = client.post('/doentes', json=payload)
+        assert r.status_code == HTTPStatus.CREATED
+        created_ids.append(r.json()["id"])
+
+    # Default should return all ordered by id (no limit)
+    r_list = client.get('/doentes')
+    assert r_list.status_code == HTTPStatus.OK
+    data = r_list.json()
+    assert "doentes" in data
+    assert len(data["doentes"]) == TEST_DOENTES_TOTAL
+    returned_ids = [d["id"] for d in data["doentes"]]
+    assert returned_ids == created_ids
+
+
+def test_read_doentes_pagination_params(client):
+    # Create 12 doentes
+    created_ids = []
+    for i in range(TEST_DOENTES_TOTAL):
+        payload = {
+            "numero_processo": _unique_numero_processo(),
+            "nome": f"User P {i}",
+            "data_nascimento": "1991-01-01",
+            "sexo": "M" if i % 2 == 0 else "F",
+            "morada": f"Av {i}"
+        }
+        r = client.post('/doentes', json=payload)
+        assert r.status_code == HTTPStatus.CREATED
+        created_ids.append(r.json()["id"])
+
+    # offset 10, limit 5 should return last 2
+    r_list = client.get('/doentes', params={"offset": 10, "limit": 5})
+    assert r_list.status_code == HTTPStatus.OK
+    data = r_list.json()
+    ids = [d["id"] for d in data["doentes"]]
+    assert ids == created_ids[10:TEST_DOENTES_TOTAL]
+
+    # limit 3 should return first 3
+    r_list2 = client.get('/doentes', params={"limit": 3})
+    assert r_list2.status_code == HTTPStatus.OK
+    data2 = r_list2.json()
+    ids2 = [d["id"] for d in data2["doentes"]]
+    assert ids2 == created_ids[:3]
