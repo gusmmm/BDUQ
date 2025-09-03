@@ -106,3 +106,35 @@ def test_update_doente_not_found(client):
     response = client.put('/doentes/9999', json=updated_data)
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"error": "Doente not found"}
+
+
+def test_delete_doente(client):
+    # First, create a doente to ensure there is one to delete
+    doente_data = {
+        "numero_processo": 12349,
+        "nome": "Ana Costa",
+        "data_nascimento": "1985-05-05",
+        "sexo": "F",
+        "morada": "Rua Sample, 101"
+    }
+    create_response = client.post('/doentes', json=doente_data)
+    assert create_response.status_code == HTTPStatus.CREATED
+    created_doente = create_response.json()
+    doente_id = created_doente["id"]
+
+    # Now, delete the created doente
+    delete_response = client.delete(f'/users/{doente_id}')
+    assert delete_response.status_code == HTTPStatus.OK
+    assert delete_response.json() == {'message': 'User deleted'}
+
+    # Verify the deletion by attempting to read the doente again
+    read_response = client.get(f'/doentes/{doente_id}')
+    assert read_response.status_code == HTTPStatus.OK
+    assert read_response.json() == {"error": "Doente not found"}
+
+
+def test_delete_doente_not_found(client):
+    # Assuming 9999 does not exist
+    response = client.delete('/users/9999')
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'User not found'}

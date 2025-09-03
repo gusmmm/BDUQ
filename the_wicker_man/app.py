@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from icecream import ic
 
 from the_wicker_man.schemas import (
@@ -57,3 +57,17 @@ def update_doente(doente_id: int, doente: DoenteSchema):
             ic(f"Doente updated: {updated_doente.model_dump()}")
             return DoentePublic(**updated_doente.model_dump())
     return {"error": "Doente not found"}
+
+
+@app.delete('/users/{user_id}', response_model=MessageSchema)
+def delete_user(user_id: int):
+    if user_id > len(database) or user_id < 1:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+        )
+
+    ic(f"Deleting user with ID: {user_id}")
+    ic(f"Doente database record before deletion: {database[user_id - 1]}")
+    del database[user_id - 1]
+
+    return {'message': 'User deleted'}
