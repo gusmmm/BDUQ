@@ -34,7 +34,9 @@
 
 ## database
 - the database is used to store patient and hospital admissions information.
-- the database is a local sqlite3 database named "burning_man.db"
+- the database is a local sqlite3 database named "database.db"
+- the migrations are managed using the alembic package.
+- the database connection string is stored in the .env file as DATABASE_URL.
 
 ## memory
 - create and update files for keeping track of the evolution of the project.

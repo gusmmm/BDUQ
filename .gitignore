@@ -28,3 +28,6 @@ Thumbs.db
 # Lock and version files
 uv.lock
 .python-version
+
+# Database files
+database.db
