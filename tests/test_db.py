@@ -1,6 +1,6 @@
-
 import random
 from dataclasses import asdict
+from datetime import date
 
 from sqlalchemy import select
 
@@ -13,7 +13,7 @@ def test_create_doente(session, mock_db_time):
         doente_data = Doente(
             numero_processo=numero_processo,
             nome="João Silva",
-            data_nascimento="1980-01-01",
+            data_nascimento=date(1980, 1, 1),  # was "1980-01-01"
             sexo="M",
             morada="Rua Exemplo, 123"
         )
@@ -27,7 +27,7 @@ def test_create_doente(session, mock_db_time):
         "id": 1,
         "numero_processo": numero_processo,
         "nome": "João Silva",
-        "data_nascimento": "1980-01-01",
+        "data_nascimento": date(1980, 1, 1),  # expect a date object now
         "sexo": "M",
         "morada": "Rua Exemplo, 123",
         "created_at": fixed_time,

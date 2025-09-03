@@ -1,3 +1,5 @@
+from datetime import date
+
 from pydantic import BaseModel
 
 
@@ -8,7 +10,7 @@ class MessageSchema(BaseModel):
 class DoenteSchema(BaseModel):
     numero_processo: int
     nome: str
-    data_nascimento: str
+    data_nascimento: date  # was str; Pydantic will parse "YYYY-MM-DD"
     sexo: str
     morada: str
 
