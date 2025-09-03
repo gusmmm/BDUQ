@@ -134,9 +134,9 @@ def test_delete_doente(client):
     doente_id = created_doente["id"]
 
     # Now, delete the created doente
-    delete_response = client.delete(f'/users/{doente_id}')
+    delete_response = client.delete(f'/doentes/{doente_id}')
     assert delete_response.status_code == HTTPStatus.OK
-    assert delete_response.json() == {'message': 'User deleted'}
+    assert delete_response.json() == {'message': 'Doente deleted'}
 
     # Verify the deletion by attempting to read the doente again
     read_response = client.get(f'/doentes/{doente_id}')
@@ -146,9 +146,9 @@ def test_delete_doente(client):
 
 def test_delete_doente_not_found(client):
     # Assuming 9999 does not exist
-    response = client.delete('/users/9999')
+    response = client.delete('/doentes/9999')
     assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json() == {'detail': 'User not found'}
+    assert response.json() == {'detail': 'Doente not found'}
 
 
 def test_create_doente_conflict(client):

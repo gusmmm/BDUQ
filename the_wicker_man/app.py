@@ -114,16 +114,16 @@ def update_doente(
     )
 
 
-@app.delete('/users/{user_id}', response_model=MessageSchema)
-def delete_user(user_id: int, session: Session = Depends(get_session)):
-    doente = session.get(Doente, user_id)
+@app.delete('/doentes/{doente_id}', response_model=MessageSchema)
+def delete_doente(doente_id: int, session: Session = Depends(get_session)):
+    doente = session.get(Doente, doente_id)
     if not doente:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+            status_code=HTTPStatus.NOT_FOUND, detail='Doente not found'
         )
 
-    ic(f"Deleting user with ID: {user_id}")
+    ic(f"Deleting doente with ID: {doente_id}")
     session.delete(doente)
     session.commit()
 
-    return {'message': 'User deleted'}
+    return {'message': 'Doente deleted'}
