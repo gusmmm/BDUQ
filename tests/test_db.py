@@ -30,5 +30,6 @@ def test_create_doente(session, mock_db_time):
         "data_nascimento": "1980-01-01",
         "sexo": "M",
         "morada": "Rua Exemplo, 123",
-        "created_at": fixed_time
+        "created_at": fixed_time,
+        "last_modified": fixed_time,
     }

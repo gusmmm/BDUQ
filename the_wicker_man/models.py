@@ -22,3 +22,9 @@ class Doente:
         init=False,
         server_default=func.now()
     )
+    last_modified: Mapped[datetime] = mapped_column(
+        init=False,
+        default=func.now(),
+        onupdate=func.now(),
+        nullable=True,
+    )
